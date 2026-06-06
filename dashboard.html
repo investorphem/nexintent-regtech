@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexIntent RegTech Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0B0F19; color: #F3F4F6; font-family: system-ui, -apple-system, sans-serif; }
+        .chat-box { height: calc(100vh - 240px); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #1F2937; border-radius: 3px; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar Menu -->
+    <div class="w-64 bg-[#111827] border-r border-[#1F2937] flex flex-col justify-between p-4 hidden md:flex">
+        <div>
+            <div class="flex items-center space-x-2 mb-8">
+                <div class="h-8 w-8 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-white text-lg">N</div>
+                <span class="text-xl font-bold tracking-wider bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">NexIntent</span>
+            </div>
+            <nav class="space-y-2">
+                <a href="#" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg bg-indigo-600/10 text-indigo-400 font-medium">
+                    <span>🛡️ Compliance Copilot</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1F2937] hover:text-white transition">
+                    <span>📊 Audit Data Silos</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-400 hover:bg-[#1F2937] hover:text-white transition">
+                    <span>⚙️ API Connections</span>
+                </a>
+            </nav>
+        </div>
+        <div class="border-t border-[#1F2937] pt-4 flex items-center space-x-3">
+            <div class="h-9 w-9 bg-gray-700 rounded-full flex items-center justify-center font-semibold text-sm">CO</div>
+            <div>
+                <p class="text-sm font-medium text-white">Compliance Officer</p>
+                <p class="text-xs text-green-400 flex items-center gap-1"><span class="h-1.5 w-1.5 bg-green-400 rounded-full inline-block"></span> Secure Session</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <div class="flex-1 flex flex-col h-full bg-[#0B0F19]">
+        <!-- Top Navigation -->
+        <header class="h-16 border-b border-[#1F2937] flex items-center justify-between px-6 bg-[#111827]/50 backdrop-blur">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-lg font-semibold text-white">AML & FinTech Audit Stream</h1>
+                <span class="px-2 py-0.5 rounded text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">FCA Sandbox Mode</span>
+            </div>
+            <div class="text-xs text-gray-400 bg-[#1F2937] px-3 py-1.5 rounded-md border border-[#374151]">
+                System Enforced Encrypted Connection (AES-256)
+            </div>
+        </header>
+
+        <!-- Chat Logs Interface -->
+        <main class="flex-1 p-6 flex flex-col justify-between overflow-hidden">
+            <div id="chat-stream" class="chat-box overflow-y-auto space-y-4 pr-2">
+                
+                <!-- Welcome Prompt -->
+                <div class="bg-[#111827] border border-[#1F2937] p-4 rounded-xl max-w-3xl">
+                    <p class="text-indigo-400 font-medium text-sm mb-1">🤖 NexIntent Copilot initialized</p>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        Secure read-only bridges are active across both traditional fiat payment processors and Web3 stablecoin liquidity pools. How can I assist your compliance audit today?
+                    </p>
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        <button onclick="prefillQuery('Scan all transactions from the last 48 hours for high risk flags.')" class="text-xs bg-[#1F2937] border border-[#374151] hover:border-indigo-500 px-3 py-1.5 rounded-lg text-gray-300 transition">🔍 Scan high-risk flags</button>
+                        <button onclick="prefillQuery('Check AML risk score for wallet address: 0xTornadoAffectedMixerAddress')" class="text-xs bg-[#1F2937] border border-[#374151] hover:border-indigo-500 px-3 py-1.5 rounded-lg text-gray-300 transition">⛓️ Check Web3 Wallet Risk</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Input Management -->
+            <div class="mt-4 bg-[#111827] border border-[#1F2937] p-3 rounded-xl flex items-center space-x-3 shadow-lg">
+                <input type="text" id="user-input" placeholder="Type compliance intent command (e.g., 'Pull velocity audits')..." class="flex-1 bg-transparent border-none text-white placeholder-gray-500 focus:outline-none text-sm px-2">
+                <button onclick="submitQuery()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition shadow-md shadow-indigo-600/10">
+                    Execute
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Frontend Script Framework -->
+    <script>
+        const API_URL = 'http://localhost:3000/api/audit/query';
+        const DASHBOARD_TOKEN = 'my_secure_dashboard_key'; // Matches backend .env
+
+        function prefillQuery(text) {
+            document.getElementById('user-input').value = text;
+        }
+
+        async function submitQuery() {
+            const inputField = document.getElementById('user-input');
+            const chatStream = document.getElementById('chat-stream');
+            const queryText = inputField.value.trim();
+
+            if (!queryText) return;
+
+            // Append User Message to Stream
+            chatStream.innerHTML += `
+                <div class="flex justify-end">
+                    <div class="bg-indigo-600 text-white p-3 rounded-xl rounded-tr-none max-w-xl text-sm shadow-md">
+                        ${queryText}
+                    </div>
+                </div>
+            `;
+            
+            inputField.value = '';
+            chatStream.scrollTop = chatStream.scrollHeight;
+
+            // Append Loading Indicator
+            const loadingId = 'loading-' + Date.now();
+            chatStream.innerHTML += `
+                <div id="${loadingId}" class="flex justify-start">
+                    <div class="bg-[#111827] border border-[#1F2937] p-3 rounded-xl text-gray-400 text-sm italic">
+                        Processing natural language compliance intent...
+                    </div>
+                </div>
+            `;
+            chatStream.scrollTop = chatStream.scrollHeight;
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${DASHBOARD_TOKEN}`
+                    },
+                    body: JSON.stringify({
+                        userText: queryText,
+                        officerId: "officer_01"
+                    })
+                });
+
+                const result = await response.json();
+                document.getElementById(loadingId).remove();
+
+                if (result.success) {
+                    chatStream.innerHTML += `
+                        <div class="flex justify-start">
+                            <div class="bg-[#111827] border border-[#1F2937] p-4 rounded-xl rounded-tl-none max-w-3xl text-sm text-gray-200 leading-relaxed shadow-md whitespace-pre-line">
+                                ${result.reply}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    throw new Error(result.error || "Execution failed");
+                }
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                chatStream.innerHTML += `
+                    <div class="flex justify-start">
+                        <div class="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-red-400 text-sm">
+                            ⚠️ API Connection Error: Ensure your Node.js backend server is running locally on port 3000.
+                        </div>
+                    </div>
+                `;
+            }
+            chatStream.scrollTop = chatStream.scrollHeight;
+        }
+
+        // Allow pressing Enter to execute
+        document.getElementById('user-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') submitQuery();
+        });
+    </script>
+</body>
+</html>
